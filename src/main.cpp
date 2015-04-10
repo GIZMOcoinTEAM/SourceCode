@@ -43,6 +43,7 @@ CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 unsigned int nTargetSpacing = 60; // 60 seconds
 unsigned int nStakeMinAge = 8 * 60 * 60; // 8 hour
 unsigned int nStakeMaxAge = -1;           //unlimited
+unsigned int nStakeMaxAgeNew = 32 * 60 * 60; // 32 hours
 unsigned int nModifierInterval = 10 * 60; // time to elapse before new modifier is computed
 
 int nCoinbaseMaturity = 20;
@@ -989,8 +990,14 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
 
     nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
 
-    int64_t nSubsidy = nCoinAge * nRewardCoinYear / 365 / COIN;
+    int64_t nSubsidy;
 
+    if (pindexBest->nTime >= STAKE_FIX_START) {
+         nSubsidy = (nCoinAge / COIN) * (nRewardCoinYear / 365);
+    } else {
+         // overflows for big nCoinAges
+         nSubsidy = nCoinAge * nRewardCoinYear / 365 / COIN;
+    }
 
     if (fDebug && GetBoolArg("-printcreation"))
         printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
