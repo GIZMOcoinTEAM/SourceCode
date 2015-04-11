@@ -30,7 +30,9 @@ static const int DATABASE_VERSION = 70508;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 60013;
+// 60013: original gizmo
+// 61100: stake security fix + stake weight overflow error fix
+static const int PROTOCOL_VERSION = 61100;
 
 // earlier versions not supported as of Feb 2012, and are disconnected
 static const int MIN_PROTO_VERSION = 209;

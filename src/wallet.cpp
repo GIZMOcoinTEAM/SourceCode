@@ -15,6 +15,7 @@
 
 using namespace std;
 extern unsigned int nStakeMaxAge;
+extern unsigned int nStakeMaxAgeNew;
 
 unsigned int nStakeSplitAge = 1 * 24 * 60 * 60;
 int64_t nStakeCombineThreshold = 1000 * COIN;
@@ -1497,6 +1498,15 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx&
 // NovaCoin: get current stake weight
 bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64_t& nMinWeight, uint64_t& nMaxWeight, uint64_t& nWeight)
 {
+
+    int64_t nStkMxAge;
+
+    if (pindexBest->nTime >= STAKE_FIX_START) {
+         nStkMxAge = (int64_t) nStakeMaxAgeNew;
+    } else {
+         nStkMxAge = (int64_t) nStakeMaxAge;
+    }
+
     // Choose coins to use
     int64_t nBalance = GetBalance();
 
@@ -1534,13 +1544,13 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64_t& nMinWeight, ui
         }
 
         // Weight is greater than zero, but the maximum value isn't reached yet
-        if (nTimeWeight > 0 && nTimeWeight < nStakeMaxAge)
+        if (nTimeWeight > 0 && nTimeWeight < nStkMxAge)
         {
             nMinWeight += bnCoinDayWeight.getuint64();
         }
 
         // Maximum weight was reached
-        if (nTimeWeight == nStakeMaxAge)
+        if (nTimeWeight == nStkMxAge)
         {
             nMaxWeight += bnCoinDayWeight.getuint64();
         }
